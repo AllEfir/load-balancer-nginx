@@ -1,0 +1,31 @@
+---
+# tasks file for frontend
+- name: install epel
+  shell: amazon-linux-extras install epel -y|
+    yum-config-manager --enable epel
+
+- name: install nginx
+  yum: name=nginx state=present
+
+- name: Started service for nginx
+  service: name=nginx state=started enabled=yes
+
+- name: install git
+  yum: name=git state=present
+
+- name: deploy site git
+  git:
+    repo: 'https://github.com/AllEfir/files.git'
+    dest: /home/files/
+
+- name: copy conf.file nginx
+  copy:
+    src: /home/makentosh/Desktop/nginx.conf
+    dest: /etc/nginx/
+  notify: Restart Nginx
+
+#    - name: install certbot
+#      yum: name=certbot-nginx state=present
+
+#    - name: run certbot and generate ssl cert
+#      shell: certbot --nginx -m Nekit4444@ukr.net --agree-tos -d makentosh.xyz -n

@@ -38,3 +38,27 @@
     - name: Restart Nginx
       service: name=nginx state=restarted
 
+- name: Install nginx load-balancer
+  hosts: load_balancer
+  become: yes
+
+  tasks:
+    - name: install epel
+      shell: amazon-linux-extras install epel -y|
+             yum-config-manager --enable epel
+
+    - name: install nginx for load b
+      yum: name=nginx state=present
+
+    - name: service for nginx load b
+      service: name=nginx state=started enabled=yes
+
+    - name: copy load_balancer.conf nginx
+      copy:
+        src: ./load-balancer.conf
+        dest: /home/ec2-user/
+      notify: Restart Nginx
+
+  handlers:
+    - name: Restart Nginx
+      service: name=nginx state=restarted
