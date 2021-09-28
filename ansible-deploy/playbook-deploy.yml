@@ -1,0 +1,14 @@
+---
+- name: Install Nginx
+  hosts: nginx_servers
+  become: yes
+
+  roles:
+    - frontend
+
+- name: Install nginx load-balancer
+  hosts: load_balancer
+  become: yes
+
+  roles:
+    - balancer

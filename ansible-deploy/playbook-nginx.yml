@@ -1,0 +1,64 @@
+---
+- name: Install Nginx
+  hosts: nginx_servers
+  become: yes
+
+  tasks:
+    - name: install epel
+      shell: amazon-linux-extras install epel -y|
+             yum-config-manager --enable epel
+
+    - name: install nginx
+      yum: name=nginx state=present
+
+    - name: Started service for nginx
+      service: name=nginx state=started enabled=yes
+
+    - name: install git
+      yum: name=git state=present
+
+    - name: deploy site git
+      git:
+        repo: 'https://github.com/AllEfir/files.git'
+        dest: /home/files/
+
+    - name: copy conf.file nginx
+      copy:
+        src: /home/makentosh/Desktop/nginx.conf
+        dest: /etc/nginx/
+      notify: Restart Nginx
+
+#    - name: install certbot
+#      yum: name=certbot-nginx state=present
+
+#    - name: run certbot and generate ssl cert
+#      shell: certbot --nginx -m Nekit4444@ukr.net --agree-tos -d makentosh.xyz -n
+
+  handlers:
+    - name: Restart Nginx
+      service: name=nginx state=restarted
+
+- name: Install nginx load-balancer
+  hosts: load_balancer
+  become: yes
+
+  tasks:
+    - name: install epel
+      shell: amazon-linux-extras install epel -y|
+             yum-config-manager --enable epel
+
+    - name: install nginx for load b
+      yum: name=nginx state=present
+
+    - name: service for nginx load b
+      service: name=nginx state=started enabled=yes
+
+    - name: copy load_balancer.conf nginx
+      copy:
+        src: ./load-balancer.conf
+        dest: /home/ec2-user/
+      notify: Restart Nginx
+
+  handlers:
+    - name: Restart Nginx
+      service: name=nginx state=restarted

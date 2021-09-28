@@ -1,0 +1,18 @@
+---
+# tasks file for balancer
+- name: install epel
+  shell: amazon-linux-extras install epel -y|
+         yum-config-manager --enable epel
+
+- name: install nginx for load b
+  yum: name=nginx state=present
+
+- name: service for nginx load b
+  service: name=nginx state=started enabled=yes
+
+- name: copy load_balancer.conf nginx
+  copy:
+      src: load-balancer.conf
+      dest: /etc/nginx/conf.d
+  notify: Restart Nginx
+
